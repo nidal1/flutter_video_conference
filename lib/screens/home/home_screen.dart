@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/meeting_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -7,14 +8,21 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  late TabController _tabController;
+  final List<String> _titles = ['Ongoing', 'Upcoming', 'Ended', 'Canceled'];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: _titles.length, vsync: this);
+
+    // مهم باش يبدل اللون مني يتبدل tab
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        setState(() {}); // refresh UI
+      }
+    });
   }
 
   @override
@@ -28,20 +36,26 @@ class _HomeScreenState extends State<HomeScreen>
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
-        backgroundColor: Theme.of(context).colorScheme.background,
-        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.calendar_month),
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white, // icon color
+          ),
+          icon: const Icon(Icons.calendar_month_outlined),
           onPressed: () {},
         ),
         actions: [
           IconButton(
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white, // icon color
+            ),
             icon: const Icon(
               Icons.notifications_none,
             ), // يمكن تبدلو بـ Icons.message
             onPressed: () {},
           ),
           IconButton(
+            style: IconButton.styleFrom(backgroundColor: Colors.black),
+            color: Colors.white,
             icon: const Icon(Icons.add),
             onPressed: () {
               // Navigator.pushNamed(context, '/create-meeting');
@@ -49,43 +63,57 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 8),
-            const Text(
-              'Hi, Murad Hossain',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const Text(
-              'Start your meeting',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
-            TabBar(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          const Text(
+            'Hi, Murad Hossain',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const Text(
+            'Start your meeting',
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+          const SizedBox(height: 16),
+          TabBar(
+            overlayColor: WidgetStateProperty.all(Colors.transparent),
+            tabAlignment: TabAlignment.start,
+            controller: _tabController,
+            dividerColor: Colors.transparent,
+            isScrollable: true,
+            labelPadding: EdgeInsets.zero,
+            indicator: const BoxDecoration(), // indicator khawi
+            tabs: List.generate(_titles.length, (index) {
+              final isSelected = _tabController.index == index;
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.black : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  _titles[index],
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: TabBarView(
               controller: _tabController,
-              isScrollable: true,
-              labelColor: Theme.of(context).colorScheme.primary,
-              unselectedLabelColor: Colors.grey,
-              indicatorColor: Theme.of(context).colorScheme.primary,
-              tabs: const [
-                Tab(text: 'Ongoing'),
-                Tab(text: 'Upcoming'),
-                Tab(text: 'Ended'),
-                Tab(text: 'Canceled'),
-              ],
+              children: List.generate(4, (_) => _buildMeetingList()),
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: List.generate(4, (_) => _buildMeetingList()),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -96,67 +124,6 @@ class _HomeScreenState extends State<HomeScreen>
       itemBuilder: (_, index) => const Padding(
         padding: EdgeInsets.symmetric(vertical: 8.0),
         child: MeetingCard(),
-      ),
-    );
-  }
-}
-
-class MeetingCard extends StatelessWidget {
-  const MeetingCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top badges (date + time)
-            Row(
-              children: [
-                _buildBadge(context, 'May 25'),
-                const SizedBox(width: 8),
-                _buildBadge(context, '18:00'),
-              ],
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Weekly meetings',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text(
-                  "Murad's Hossain meeting room",
-                  style: TextStyle(color: Colors.grey),
-                ),
-                Text("Start in 3 hours", style: TextStyle(color: Colors.blue)),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBadge(BuildContext context, String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.primary,
-          fontWeight: FontWeight.bold,
-        ),
       ),
     );
   }

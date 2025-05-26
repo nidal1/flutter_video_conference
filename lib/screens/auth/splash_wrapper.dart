@@ -9,19 +9,23 @@ class SplashWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: AuthService().userChanges,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        if (snapshot.hasData) {
-          return const HomeScreen();
-        }
-        return LoginScreen();
-      },
+    return Container(
+      color: const Color.fromRGBO(242, 242, 242, 1),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: StreamBuilder<User?>(
+        stream: AuthService().userChanges,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+          if (snapshot.hasData) {
+            return const HomeScreen();
+          }
+          return LoginScreen();
+        },
+      ),
     );
   }
 }
