@@ -120,10 +120,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _buildMeetingList() {
     return ListView.builder(
-      itemCount: 3,
-      itemBuilder: (_, index) => const Padding(
+      itemCount: 4,
+      itemBuilder: (_, index) => Padding(
         padding: EdgeInsets.symmetric(vertical: 8.0),
-        child: MeetingCard(),
+        child: MeetingCard(
+          color: index == 0
+              ? "black"
+              : index == 1
+              ? "orange"
+              : index == 2
+              ? "green"
+              : "blue",
+        ),
       ),
     );
   }
