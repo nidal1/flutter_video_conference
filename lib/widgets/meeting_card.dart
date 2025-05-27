@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_video_conference/models/meeting_model.dart';
+import 'package:intl/intl.dart';
 import 'positioned_avatar.dart';
 import 'more_participants_avatar.dart';
 
 class MeetingCard extends StatelessWidget {
-  final String color;
-  const MeetingCard({super.key, required this.color});
+  final MeetingModel meetingData;
+  MeetingCard({super.key, required this.meetingData});
 
   Color get cardColor {
-    switch (color) {
+    switch (meetingData.cardColor) {
       case 'blue':
         return const Color(0xFF694cf1);
       case 'orange':
@@ -22,7 +24,7 @@ class MeetingCard extends StatelessWidget {
   }
 
   Color get textColor {
-    switch (color) {
+    switch (meetingData.cardColor) {
       case 'blue':
       case 'black':
         return Colors.white;
@@ -36,6 +38,11 @@ class MeetingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int lastIndex = 0;
+
+    final duration = meetingData.startTime!.difference(DateTime.now());
+    final hours = duration.inHours;
+
     return Card(
       elevation: 1,
       color: cardColor,
@@ -51,9 +58,16 @@ class MeetingCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    _buildBadge(context, 'May 25, 2025'),
+                    _buildBadge(
+                      context,
+                      DateFormat('MMM, d').format(meetingData.startTime!),
+                    ),
+
                     const SizedBox(width: 8),
-                    _buildBadge(context, '18:00-19:00 GMT'),
+                    _buildBadge(
+                      context,
+                      '${DateFormat('HH:mm').format(meetingData.startTime!)}-${DateFormat('HH:mm').format(meetingData.endTime!)}',
+                    ),
                   ],
                 ),
                 IconButton(
@@ -64,7 +78,7 @@ class MeetingCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Weekly meetings',
+              meetingData.title!,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -75,14 +89,14 @@ class MeetingCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Murad's Hossain meeting room",
+                  "${meetingData.owner} meeting room",
                   style: TextStyle(
                     color: textColor.withAlpha((0.7 * 255).toInt()),
                     fontSize: 12,
                   ),
                 ),
                 Text(
-                  "Start in 3 hours",
+                  "Start in $hours hours",
                   style: TextStyle(
                     color: textColor.withAlpha((0.7 * 255).toInt()),
                     fontSize: 12,
@@ -103,28 +117,21 @@ class MeetingCard extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     fit: StackFit.loose,
                     children: [
-                      PositionedAvatar(
-                        imagePath: 'assets/images/test.png',
-                        left: 0,
-                        border: Border.all(color: Colors.black45, width: 1),
-                      ),
-                      PositionedAvatar(
-                        imagePath: 'assets/images/react.png',
-                        left: 16,
-                        border: Border.all(color: Colors.black45, width: 1),
-                      ),
-                      PositionedAvatar(
-                        imagePath: 'assets/images/ai.png',
-                        left: 32,
-                        border: Border.all(color: Colors.black45, width: 1),
-                      ),
-                      PositionedAvatar(
-                        imagePath: 'assets/images/avengers.png',
-                        left: 48,
-                        border: Border.all(color: Colors.black45, width: 1),
-                      ),
+                      ...(meetingData.participants?.map((p) {
+                            lastIndex++;
+                            return PositionedAvatar(
+                              imagePath: 'assets/images/$p.png',
+                              left: meetingData.participants!.indexOf(p) * 16.0,
+                              border: Border.all(
+                                color: Colors.black45,
+                                width: 1,
+                              ),
+                            );
+                          }).toList() ??
+                          []),
+
                       MoreParticipantsAvatar(
-                        left: 60,
+                        left: lastIndex * 16.0,
                         label: '+5',
                         backgroundColor: const Color(0xFF263238),
                         border: Border.all(color: Colors.black45, width: 1),
@@ -154,27 +161,19 @@ class MeetingCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  "Meeting Started",
-                  style: TextStyle(fontSize: 12, color: textColor),
+                  "Meeting ID",
+                  style: TextStyle(
+                    color: textColor.withAlpha((0.7 * 255).toInt()),
+                    fontSize: 12,
+                  ),
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "Meeting ID",
-                      style: TextStyle(
-                        color: textColor.withAlpha((0.7 * 255).toInt()),
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      "1234567890",
-                      style: TextStyle(fontSize: 12, color: textColor),
-                    ),
-                  ],
+                const SizedBox(width: 4),
+                Text(
+                  meetingData.id!,
+                  style: TextStyle(fontSize: 12, color: textColor),
                 ),
               ],
             ),

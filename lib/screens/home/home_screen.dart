@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_video_conference/core/services/auth_service.dart';
+import 'package:flutter_video_conference/core/services/meeting_service.dart';
 import '../../widgets/meeting_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -57,8 +59,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             style: IconButton.styleFrom(backgroundColor: Colors.black),
             color: Colors.white,
             icon: const Icon(Icons.add),
-            onPressed: () {
-              // Navigator.pushNamed(context, '/create-meeting');
+            onPressed: () async {
+              await AuthService().signOut();
             },
           ),
         ],
@@ -110,7 +112,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: List.generate(4, (_) => _buildMeetingList()),
+              children: List.generate(
+                4,
+                (_) => _buildMeetingList(
+                  _titles[_tabController.index].toLowerCase(),
+                ),
+              ),
             ),
           ),
         ],
@@ -118,21 +125,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildMeetingList() {
-    return ListView.builder(
-      itemCount: 4,
-      itemBuilder: (_, index) => Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.0),
-        child: MeetingCard(
-          color: index == 0
-              ? "black"
-              : index == 1
-              ? "orange"
-              : index == 2
-              ? "green"
-              : "blue",
-        ),
-      ),
+  Widget _buildMeetingList(String status) {
+    return FutureBuilder(
+      future: MeetingService().fetchMeetingsByStatus(status),
+      builder: (context, asyncSnapshot) {
+        if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (asyncSnapshot.hasError) {
+          return Center(child: Text('Error: ${asyncSnapshot.error}'));
+        }
+        if (!asyncSnapshot.hasData || (asyncSnapshot.data as List).isEmpty) {
+          return const Center(child: Text('No meetings found'));
+        }
+
+        final data = asyncSnapshot.data!;
+        return ListView.builder(
+          itemCount: data.length,
+          itemBuilder: (_, index) {
+            final meeting = data[index];
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: MeetingCard(meetingData: meeting),
+            );
+          },
+        );
+      },
     );
   }
 }
