@@ -12,7 +12,20 @@
           "package_name": "com.video.conference.flutter_video_conference"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "360509427650-doi3b9s5nh8j94fogvgfktg3ehvo5m2m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.video.conference.flutter_video_conference",
+            "certificate_hash": "fce73d07a76cbdc649b33589b605d7e9b5384258"
+          }
+        },
+        {
+          "client_id": "360509427650-fsmbv49ouvur7226os3jsobbo9lvrbmv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAD4qtv_kJdC6--05RA6r63LHQ77NZhGLQ"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "360509427650-fsmbv49ouvur7226os3jsobbo9lvrbmv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "360509427650-p215lk88top7aatb2t22ssfouu94lpqk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.video.conference.flutterVideoConference"
+              }
+            }
+          ]
         }
       }
     }

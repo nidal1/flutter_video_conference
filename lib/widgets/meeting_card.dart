@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_video_conference/models/meeting_model.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'positioned_avatar.dart';
 import 'more_participants_avatar.dart';
@@ -146,7 +147,9 @@ class MeetingCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    context.push('/meeting/${meetingData.id}');
+                  },
                   label: Text(
                     "Join Now",
                     style: TextStyle(color: Colors.black),

@@ -9,9 +9,7 @@ class SplashWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: const Color.fromRGBO(242, 242, 242, 1),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    return MainContainer(
       child: StreamBuilder<User?>(
         stream: AuthService().userChanges,
         builder: (context, snapshot) {
@@ -26,6 +24,20 @@ class SplashWrapper extends StatelessWidget {
           return LoginScreen();
         },
       ),
+    );
+  }
+}
+
+class MainContainer extends StatelessWidget {
+  final Widget child;
+  const MainContainer({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color.fromRGBO(242, 242, 242, 1),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: child,
     );
   }
 }
