@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_video_conference/screens/auth/splash_wrapper.dart';
 import 'package:flutter_video_conference/screens/home/home_screen.dart';
-import 'package:flutter_video_conference/screens/home/meeting_screen.dart';
+import 'package:flutter_video_conference/screens/meeting/join_meeting_screen.dart';
 import 'package:go_router/go_router.dart';
 
 void main() async {
@@ -21,7 +21,7 @@ final GoRouter _router = GoRouter(
       path: '/meeting/:meetingId',
       builder: (context, state) {
         final meetingId = state.pathParameters['meetingId']!;
-        return MeetingScreen(meetingId: meetingId);
+        return JoinMeetingScreen(meetingId: meetingId);
       },
     ),
   ],

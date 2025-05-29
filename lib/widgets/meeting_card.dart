@@ -7,7 +7,7 @@ import 'more_participants_avatar.dart';
 
 class MeetingCard extends StatelessWidget {
   final MeetingModel meetingData;
-  MeetingCard({super.key, required this.meetingData});
+  const MeetingCard({super.key, required this.meetingData});
 
   Color get cardColor {
     switch (meetingData.cardColor) {
