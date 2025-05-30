@@ -6,9 +6,9 @@ class MeetingModel {
   String? owner;
   DateTime? startTime;
   DateTime? endTime;
-  String? status; // Optional field for meeting status
-  String? cardColor; // Optional field for card color
-  List<String>? participants;
+  String? status; // e.g. 'ongoing', 'upcoming', etc.
+  String? cardColor;
+  List<Participant>? participants;
 
   MeetingModel({
     this.id,
@@ -21,38 +21,45 @@ class MeetingModel {
     this.participants,
   });
 
-  // Factory method to create a MeetingModel from a map
-  factory MeetingModel.fromMap(Map<String, dynamic> map) {
+  factory MeetingModel.fromMap(Map<String, dynamic> map, {String? id}) {
     return MeetingModel(
-      id: map['id'],
+      id: id ?? map['id'],
       title: map['title'],
       owner: map['owner'],
-      startTime: map['startTime'] is Timestamp
-          ? (map['startTime'] as Timestamp).toDate()
-          : map['startTime'] is String
-          ? DateTime.parse(map['startTime'])
-          : map['startTime'] as DateTime?,
-      endTime: map['endTime'] is Timestamp
-          ? (map['endTime'] as Timestamp).toDate()
-          : map['endTime'] is String
-          ? DateTime.parse(map['endTime'])
-          : map['endTime'] as DateTime?,
+      status: map['status'],
       cardColor: map['cardColor'],
-      participants: List<String>.from(map['participants'] ?? []),
+      startTime: (map['startTime'] as Timestamp?)?.toDate(),
+      endTime: (map['endTime'] as Timestamp?)?.toDate(),
+      participants: (map['participants'] as List<dynamic>?)
+          ?.map((e) => Participant.fromMap(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
-  // Method to convert MeetingModel to a map
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'title': title,
       'owner': owner,
-      'status': status, // Optional field for meeting status
-      'cardColor': cardColor, // Optional field for card color
-      'startTime': startTime?.toIso8601String(),
-      'endTime': endTime?.toIso8601String(),
-      'participants': participants,
+      'status': status,
+      'cardColor': cardColor,
+      'startTime': startTime != null ? Timestamp.fromDate(startTime!) : null,
+      'endTime': endTime != null ? Timestamp.fromDate(endTime!) : null,
+      'participants': participants?.map((e) => e.toMap()).toList(),
     };
+  }
+}
+
+class Participant {
+  final String uid;
+  final String avatar;
+
+  Participant({required this.uid, required this.avatar});
+
+  factory Participant.fromMap(Map<String, dynamic> map) {
+    return Participant(uid: map['uid'], avatar: map['avatar']);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {'uid': uid, 'avatar': avatar};
   }
 }
